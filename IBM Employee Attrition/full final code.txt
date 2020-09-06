@@ -1,0 +1,188 @@
+#Loading Required packages
+library("corrplot")
+library("ggplot2")
+library("caret")
+library("rpart")
+library("rpart.plot")
+library("e1071")
+library("caTools")
+library("rattle")
+library("gridExtra")
+library("ROCR")
+library("randomForest")
+library("randomForestSRC")
+library("reshape2")
+library("RColorBrewer")
+library("lattice")
+library("grid")
+library("corrplot")
+library("gridExtra")
+library("grid")
+library("ggplot2")
+library("lattice")
+
+#Loading Data into R
+dataset=read.csv("E:/R projects/Attrition.csv")
+
+#Exploratory Data Analysis
+summary(dataset)
+str(dataset)
+
+#Removing Variables with same value for every observation
+dataset$EmployeeCount=dataset$EmployeeNumber=dataset$Over18=dataset$StandardHours=NULL
+
+#EDA for numeric data
+a1=ggplot(dataset,aes(x=Age))+geom_histogram(color="black",fill="orange")+ ggtitle("Age Vs Count")
+a2=ggplot(dataset,aes(x=YearsWithCurrManager))+geom_histogram(color="black",fill="orange")+ ggtitle("YearsWithCurrManager Vs Count")
+a3=ggplot(dataset,aes(x=DailyRate))+geom_histogram(color="black",fill="orange")+ ggtitle("DailyRate Vs Count")
+a4=ggplot(dataset,aes(x=DistanceFromHome))+geom_histogram(color="black",fill="orange")+ ggtitle("DistanceFromHome Vs Count")
+a5=ggplot(dataset,aes(x=HourlyRate))+geom_histogram(color="black",fill="orange")+ ggtitle("HourlyRate Vs Count")
+a6=ggplot(dataset,aes(x=MonthlyIncome))+geom_histogram(color="black",fill="orange")+ ggtitle("MonthlyIncome Vs Count")
+a7=ggplot(dataset,aes(x=MonthlyRate))+geom_histogram(color="black",fill="orange")+ ggtitle("MonthlyRate Vs Count")
+a8=ggplot(dataset,aes(x=NumCompaniesWorked))+geom_histogram(color="black",fill="orange")+ ggtitle("NumCompaniesWorked Vs Count")
+a9=ggplot(dataset,aes(x=PercentSalaryHike))+geom_histogram(color="black",fill="orange")+ ggtitle("PercentSalaryHike Vs Count")
+a10=ggplot(dataset,aes(x=TotalWorkingYears))+geom_histogram(color="black",fill="orange")+ ggtitle("TotalWorkingYears Vs Count")
+a11=ggplot(dataset,aes(x=TrainingTimesLastYear))+geom_histogram(color="black",fill="orange")+ ggtitle("TrainingTimesLastYear Vs Count")
+a12=ggplot(dataset,aes(x=YearsAtCompany))+geom_histogram(color="black",fill="orange")+ ggtitle("YearsAtCompany Vs Count")
+a13=ggplot(dataset,aes(x=YearsInCurrentRole))+geom_histogram(color="black",fill="orange")+ ggtitle("YearsInCurrentRole Vs Count")
+a14=ggplot(dataset,aes(x=YearsSinceLastPromotion))+geom_histogram(color="black",fill="orange")+ ggtitle("YearsSinceLastPromotion Vs Count")
+a15=ggplot(dataset,aes(x=YearsWithCurrManager))+geom_histogram(color="black",fill="orange")+ ggtitle("YearsWithCurrManager Vs Count")
+grid.arrange(a1,a2,a3,a4, a5,a6,a7,a8,ncol=2)
+grid.arrange(a9,a10,a11,a12,a13,a14,a15,ncol=2)
+#EDA for categorical Variables
+
+b1=ggplot(dataset,aes(x=Attrition))+geom_bar(color="black",fill="blue")+
+  theme(axis.text.x = element_text(size = 10,angle=45,hjust = 1,vjust = 1))+
+  ggtitle("Attrition Vs Count")
+b2=ggplot(dataset,aes(x=BusinessTravel))+geom_bar(color="black",fill="blue")+
+  theme(axis.text.x = element_text(size = 10,angle=45,hjust = 1,vjust = 1))+
+  ggtitle("BusinessTravel Vs Count")
+b3=ggplot(dataset,aes(x=Department))+geom_bar(color="black",fill="blue")+
+  theme(axis.text.x = element_text(size = 10,angle=45,hjust = 1,vjust = 1))+
+  ggtitle("Department Vs Count")
+b4=ggplot(dataset,aes(x=Education))+geom_bar(color="black",fill="blue")+
+  theme(axis.text.x = element_text(size = 10,angle=45,hjust = 1,vjust = 1))+
+  ggtitle("Education Vs Count")
+b5=ggplot(dataset,aes(x=EducationField))+geom_bar(color="black",fill="blue")+
+  theme(axis.text.x = element_text(size = 10,angle=45,hjust = 1,vjust = 1))+
+  ggtitle("EducationField Vs Count")
+b6=ggplot(dataset,aes(x=EnvironmentSatisfaction))+geom_bar(color="black",fill="blue")+
+  theme(axis.text.x = element_text(size = 10,angle=45,hjust = 1,vjust = 1))+
+  ggtitle("EnvironmentSatisfaction Vs Count")
+b7=ggplot(dataset,aes(x=Gender))+geom_bar(color="black",fill="blue")+
+  theme(axis.text.x = element_text(size = 10,angle=45,hjust = 1,vjust = 1))+
+  ggtitle("Gender Vs Count")
+b8=ggplot(dataset,aes(x=JobInvolvement))+geom_bar(color="black",fill="blue")+
+  theme(axis.text.x = element_text(size = 10,angle=45,hjust = 1,vjust = 1))+
+  ggtitle("JobInvolvement Vs Count")
+b9=ggplot(dataset,aes(x=JobLevel))+geom_bar(color="black",fill="blue")+
+  theme(axis.text.x = element_text(size = 10,angle=45,hjust = 1,vjust = 1))+
+  ggtitle("JobLevel Vs Count")
+b10=ggplot(dataset,aes(x=JobRole))+geom_bar(color="black",fill="blue")+
+  theme(axis.text.x = element_text(size = 10,angle=45,hjust = 1,vjust = 1))+
+  ggtitle("JobRole Vs Count")
+b11=ggplot(dataset,aes(x=JobSatisfaction))+geom_bar(color="black",fill="blue")+
+  theme(axis.text.x = element_text(size = 10,angle=45,hjust = 1,vjust = 1))+
+  ggtitle("JobSatisfaction Vs Count")
+b12=ggplot(dataset,aes(x=MaritalStatus))+geom_bar(color="black",fill="blue")+
+  theme(axis.text.x = element_text(size = 10,angle=45,hjust = 1,vjust = 1))+
+  ggtitle("MaritalStatus Vs Count")
+b13=ggplot(dataset,aes(x=OverTime))+geom_bar(color="black",fill="blue")+
+  theme(axis.text.x = element_text(size = 10,angle=0,hjust = 1,vjust = 1))+
+  ggtitle("OverTime Vs Count")
+b14=ggplot(dataset,aes(x=PerformanceRating))+geom_bar(color="black",fill="blue")+
+  theme(axis.text.x = element_text(size = 10,angle=0,hjust = 1,vjust = 1))+
+  ggtitle("PerformanceRating Vs Count")
+b15=ggplot(dataset,aes(x=RelationshipSatisfaction))+geom_bar(color="black",fill="blue")+
+  theme(axis.text.x = element_text(size = 10,angle=0,hjust = 1,vjust = 1))+
+  ggtitle("RelationshipSatisfaction Vs Count")
+b16=ggplot(dataset,aes(x=StockOptionLevel))+geom_bar(color="black",fill="blue")+
+  theme(axis.text.x = element_text(size = 10,angle=0,hjust = 1,vjust = 1))+
+  ggtitle("StockOptionLevel Vs Count")
+b17=ggplot(dataset,aes(x=WorkLifeBalance))+geom_bar(color="black",fill="blue")+
+  theme(axis.text.x = element_text(size = 10,angle=0,hjust = 1,vjust = 1))+
+  ggtitle("WorkLifeBalance Vs Count")
+
+grid.arrange(b1,b2,b3,b4,ncol=2)
+grid.arrange(b5,b6,b7,b8,ncol=2)
+grid.arrange(b9,b10,b11,b12,ncol=2)
+grid.arrange(b13,b14,b15,b16,ncol=2)
+grid.arrange(b17)
+
+#make the corelation  plot
+
+
+
+#preparing data for Logistic Regression
+str(dataset)
+datalr<-dataset[-c(4,5,7,8,10,11,13,14,18,21,22,23,24,25,28 )]
+str(datalr)
+#Converting categorical variables to dummy variables
+datalr$Attrition_Yes<-as.numeric(datalr$Attrition=="Yes")
+datalr$BusinessTravel_TravFreq<-as.numeric(datalr$BusinessTravel=="Travel_Frequently")
+
+datalr$BusinessTravel_TravRare<-as.numeric(datalr$BusinessTravel=="Travel_Rarely")
+datalr$MaritalStatus_D<-as.numeric(datalr$MaritalStatus=="Divorced")
+datalr$MaritalStatus_M<-as.numeric(datalr$MaritalStatus=="Single")
+
+datalr$OverTime_Y<-as.numeric(datalr$OverTime=="Yes")
+datalr1<-datalr[-c(2,3,8,11)]
+#--------------Splitting data----------------------------------------------------------
+set.seed(3000)
+split_1 <- sample.split(datalr1$Attrition_Yes, SplitRatio =0.80)
+train_1<- subset(datalr1, split_1== T)
+test_1<- subset(datalr1, split_1 == F)
+#----------------------------Building model through GLM------------------------
+
+model_glm1 <- glm(Attrition_Yes ~., data= train_1, family = 'binomial')
+summary(model_glm1)
+predicted_glm1 <- predict(model_glm1, newdata=test_1, type='response')
+
+predicted_glm1 <- ifelse(predicted_glm1 >0.5,1,0)
+
+confusionMatrix(as.factor(test_1$Attrition_Yes),as.factor (predicted_glm1))
+#--------------------------Decision Tree-----------------------------------
+#preparing data for decision tree
+datadt<-dataset[-c(4,5,7,8,10,11,13,14,18,21,22,23,24,25,28 )]
+
+#Splitting the data 
+split_final <- sample.split(datadt$Attrition, SplitRatio =0.80)
+
+train_final<- subset(datadt, split_final== T)
+
+test_final<- subset(datadt, split_final == F)
+#Decision tree model
+decisionTreeModel= rpart(Attrition~.,data=train_final,method="class",control = rpart.control(minsplit = 30,cp=0.01))
+rpart.plot(decisionTreeModel,cex=.6)
+#Predicting Values on Test Data
+predDT=predict(decisionTreeModel,newdata = test_final,type = "class")
+#Checking Accuracy for Decision Tree
+confusionMatrix(as.factor(test_final$Attrition),as.factor(predDT))
+#----------------------Random forest-----------------------
+
+#Building Random forest Model
+randomForestModel=randomForest(Attrition~.,data=train_final,ntree=250,nodesize=12)
+#Predicting values on test data
+predictRF=predict(randomForestModel,newdata=test_final)
+#Checking Accuracy for Random Forest
+confusionMatrix(test_final$Attrition,predictRF)
+
+#Preapring ROC curve for the above models
+glm_ROC=predict(model_glm1,test_1,type="response")
+pred_glm=prediction(glm_ROC,test_1$Attrition_Yes)
+perf_glm=performance(pred_glm,"tpr","fpr")
+
+dt_ROC=predict(decisionTreeModel,test_final)
+pred_dt=prediction(dt_ROC[,2],test_final$Attrition)
+perf_dt=performance(pred_dt,"tpr","fpr")
+
+RF_ROC=predict(randomForestModel,test_final,type="prob")
+pred_RF=prediction(RF_ROC[,2],test_final$Attrition)
+perf_RF=performance(pred_RF,"tpr","fpr")
+
+plot(perf_glm, main = "ROC curves for the models", col='blue')
+plot(perf_dt,add=TRUE, col='red')
+plot(perf_RF, add=TRUE, col='green3')
+legend('bottom', c("Logistic Regression", "Decision Tree", "Random Forest"), 
+       fill = c('blue','red','green3'), bty='n')
+
