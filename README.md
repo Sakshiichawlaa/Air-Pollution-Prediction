@@ -1,4 +1,3 @@
-# data-science-projects
 Air Pollution Prediction
 
 The increasing levels of pollutants in air due to industrialization and vehicular emissions, has deteriorated the air quality of India at an alarming rate. Its effects are majorly seen in metropolitan cities of India. Thus, there is an immediate need to analyze air pollution trends in order to accurately predict and hence control the air quality for the upcoming years.
